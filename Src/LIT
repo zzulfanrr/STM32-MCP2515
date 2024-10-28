@@ -1,0 +1,43 @@
+		// Prepare the message to send
+//    txMessage.frame.idType = CAN_ID_STD;
+		txMessage.frame.id = 0x36;   // Setting ID to 0x36
+		txMessage.frame.dlc = 8;     // Data length (DLC) = 8 bytes
+		txMessage.frame.data0 = 1;   // Sample data
+		txMessage.frame.data1 = 2;
+		txMessage.frame.data2 = 3;
+		txMessage.frame.data3 = 4;
+		txMessage.frame.data4 = 5;
+		txMessage.frame.data5 = 6;
+		txMessage.frame.data6 = 7;
+		txMessage.frame.data7 = 8;
+
+		// Transmit the message
+		CANSPI_Transmit(&txMessage);
+		printf(
+				"Message transmitted: ID = 0x36, Data = {1, 2, 3, 4, 5, 6, 7, 8}\n\r");
+
+		// Delay before attempting to receive the message
+		HAL_Delay(100);  // Adjust the delay as needed
+
+		// Try to receive the message in loopback
+		if (CANSPI_Receive(&rxMessage)) {
+			if (rxMessage.frame.id == 0x36) {
+				printf(
+						"Received Message: ID = 0x36, Data = {%d, %d, %d, %d, %d, %d, %d, %d}\n\r",
+						rxMessage.frame.data0, rxMessage.frame.data1,
+						rxMessage.frame.data2, rxMessage.frame.data3,
+						rxMessage.frame.data4, rxMessage.frame.data5,
+						rxMessage.frame.data6, rxMessage.frame.data7);
+				BSP_LED_Off(LED_RED);
+				BSP_LED_On(LED_GREEN);
+				BSP_LED_On(LED_BLUE);
+			}
+		} else {
+			printf("No Message Received!");
+			BSP_LED_Off(LED_RED);
+			BSP_LED_On(LED_GREEN);
+			BSP_LED_On(LED_BLUE);
+		}
+
+		// Short delay before next iteration
+		HAL_Delay(500);  // Adjust delay between sending and receiving
